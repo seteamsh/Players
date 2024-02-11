@@ -33,8 +33,8 @@ final class NetworkManager: ObservableObject {
     static let shared = NetworkManager()
     @Published var allHeroes = [AllHeroes]()
     @Published var accountId = ""
-    func fetchPlayer(from url: URL, completion: @escaping(Result<[Profile], NetworkError>) -> Void) {
-        AF.request(url)
+    func fetchPlayer(completion: @escaping(Result<[Profile], NetworkError>) -> Void) {
+        AF.request(Link.profile(accountID: accountId).url)
             .validate()
             .responseData { responseData in
                 switch responseData.result {
@@ -51,8 +51,8 @@ final class NetworkManager: ObservableObject {
                 }
             }
     }
-    func fetchGames(from url: URL, completion: @escaping(Result<Games, NetworkError>) -> Void) {
-        AF.request(url)
+    func fetchGames(completion: @escaping(Result<Games, NetworkError>) -> Void) {
+        AF.request(Link.games(accountID: accountId).url)
             .validate()
             .responseData { responseData in
                 switch responseData.result {
@@ -69,8 +69,8 @@ final class NetworkManager: ObservableObject {
                 }
             }
     }
-    func fetchMyHeroes(from url: URL, completion: @escaping(Result<[MyHeroes], NetworkError>) -> Void) {
-        AF.request(url)
+    func fetchMyHeroes(completion: @escaping(Result<[MyHeroes], NetworkError>) -> Void) {
+        AF.request(Link.myHeroes(accountID: accountId).url)
             .validate()
             .responseData { responseData in
                 switch responseData.result {
@@ -87,8 +87,8 @@ final class NetworkManager: ObservableObject {
                 }
             }
     }
-    func fetchAllHeroes(from url: URL, completion: @escaping(Result<[AllHeroes], NetworkError>) -> Void) {
-        AF.request(url)
+    func fetchAllHeroes(completion: @escaping(Result<[AllHeroes], NetworkError>) -> Void) {
+        AF.request(Link.allHeroes.url)
             .validate()
             .responseData { responseData in
                 switch responseData.result {

@@ -10,7 +10,6 @@ import Alamofire
 struct ContentView: View {
     @StateObject var networkManager = NetworkManager.shared
     @State var players = [Profile]()
-    @State var accountId = ""
     var body: some View {
         NavigationView {
             List(players, id: \.self) { player in
@@ -39,7 +38,7 @@ struct ContentView: View {
         }
     }
     func request() {
-        networkManager.fetchPlayer(from: Link.profile(accountID: networkManager.accountId).url) { result in
+        networkManager.fetchPlayer() { result in
             switch result {
             case .success(let newPlayer):
                 players.append(contentsOf: newPlayer)

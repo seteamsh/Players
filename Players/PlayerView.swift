@@ -61,7 +61,7 @@ struct PlayerView: View {
                 .tabItem { Image(systemName: "2.circle") }
         }
         .task {
-            networkManager.fetchGames(from: Link.games(accountID: networkManager.accountId).url) { result in
+            networkManager.fetchGames() { result in
                 switch result {
                 case .success(let newGames):
                     games = newGames
@@ -70,7 +70,7 @@ struct PlayerView: View {
                 }
             }
             
-            networkManager.fetchMyHeroes(from: Link.myHeroes(accountID: networkManager.accountId).url) { result in
+            networkManager.fetchMyHeroes() { result in
                 switch result {
                 case .success(let myHeroes):
                     heroes = myHeroes // Присваиваем значение myHeroes свойству heroes
@@ -78,7 +78,7 @@ struct PlayerView: View {
                     print("\(error)")
                 }
             }
-            networkManager.fetchAllHeroes(from: Link.allHeroes.url) { result in
+            networkManager.fetchAllHeroes() { result in
                 switch result {
                 case .success(let heroes):
                     networkManager.allHeroes = heroes
