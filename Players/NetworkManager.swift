@@ -11,18 +11,18 @@ enum NetworkError: Error {
     case noData
 }
 enum Link {
-    case profile
-    case games
-    case myHeroes
+    case profile(accountID: String)
+    case games(accountID: String)
+    case myHeroes(accountID: String)
     case allHeroes
     var url: URL {
         switch self {
-        case .profile:
-            return URL(string: "https://api.opendota.com/api/players/117124649")!
-        case .games:
-            return URL(string: "https://api.opendota.com/api/players/117124649/wl")!
-        case .myHeroes:
-            return URL(string: "https://api.opendota.com/api/players/117124649/heroes")!
+        case .profile(let accountID):
+            return URL(string: "https://api.opendota.com/api/players/\(accountID)")!
+        case .games(let accountID):
+            return URL(string: "https://api.opendota.com/api/players/\(accountID)/wl")!
+        case .myHeroes(let accountID):
+            return URL(string: "https://api.opendota.com/api/players/\(accountID)/heroes")!
         case .allHeroes:
             return URL(string: "https://api.opendota.com/api/heroStats")!
         }
@@ -32,7 +32,7 @@ final class NetworkManager: ObservableObject {
     init () {}
     static let shared = NetworkManager()
     @Published var allHeroes = [AllHeroes]()
-    
+    @Published var accountId = ""
     func fetchPlayer(from url: URL, completion: @escaping(Result<[Profile], NetworkError>) -> Void) {
         AF.request(url)
             .validate()

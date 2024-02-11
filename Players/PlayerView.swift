@@ -14,48 +14,54 @@ struct PlayerView: View {
     @State var heroes = [MyHeroes]()
     var body: some View {
         TabView {
-            VStack {
-                KFImage(URL(string: "\(player.avatarfull)"))
-                Text("\(player.personaname)")
-                HStack {
-                    VStack {
-                        Text("WINS")
-                        Text("\(games?.win ?? 0)")
-                            .foregroundColor(Color.green)
-                    }
-                    VStack {
-                        Text("LOSSES")
-                        Text("\(games?.lose ?? 0)")
-                            .foregroundColor(Color.red)
-                    }
-                    VStack {
-                        Text("WINRATE")
-                        Text("\(String(format: "%.2f", Double(games?.win ?? 0) / (Double(games?.win ?? 0) + Double(games?.lose ?? 0)) * 100)) %")
+            NavigationView {
+                VStack {
+                    KFImage(URL(string: "\(player.avatarfull)"))
+                    // add turbowarrior
+                    HStack {
+                        VStack {
+                            Text("WINS")
+                            Text("\(games?.win ?? 0)")
+                                .foregroundColor(Color.green)
+                        }
+                        VStack {
+                            Text("LOSSES")
+                            Text("\(games?.lose ?? 0)")
+                                .foregroundColor(Color.red)
+                        }
+                        VStack {
+                            Text("WINRATE")
+                            Text("\(String(format: "%.2f", Double(games?.win ?? 0) / (Double(games?.win ?? 0) + Double(games?.lose ?? 0)) * 100)) %")
+                        }
                     }
                 }
+                .navigationTitle("\(player.personaname)")
             }
             .tabItem { Image(systemName: "1.circle") }
-            List(heroes, id: \.self) { hero in
-                HStack {
+            NavigationView {
+                List(heroes, id: \.self) { hero in
                     HStack {
-                        KFImage(URL(string: "https://cdn.cloudflare.steamstatic.com\(networkManager.getHeroImage(for: hero.hero_id)!)"))
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 100, height: 60)
+                        HStack {
+                            KFImage(URL(string: "https://cdn.cloudflare.steamstatic.com\(networkManager.getHeroImage(for: hero.hero_id)!)"))
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 100, height: 60)
+                        }
+                        VStack {
+                            Text("\(networkManager.getHeroName(for: hero.hero_id)!)")
+                            Text("\(networkManager.timeAgoString(from: hero.last_played))")
+                        }
+                        Text("\(hero.games)")
+                            .foregroundColor(Color.green)
+                        Text("\(String(format: "%.1f", Double(hero.win) / (Double(hero.win) + Double(hero.games - hero.win)) * 100)) %")
                     }
-                    VStack {
-                        Text("\(networkManager.getHeroName(for: hero.hero_id)!)")
-                        Text("\(networkManager.timeAgoString(from: hero.last_played))")
-                    }
-                    Text("\(hero.games)")
-                        .foregroundColor(Color.green)
-                    Text("\(String(format: "%.1f", Double(hero.win) / (Double(hero.win) + Double(hero.games - hero.win)) * 100)) %")
                 }
+                .navigationTitle("Heroes")
             }
                 .tabItem { Image(systemName: "2.circle") }
         }
         .task {
-            networkManager.fetchGames(from: Link.games.url) { result in
+            networkManager.fetchGames(from: Link.games(accountID: networkManager.accountId).url) { result in
                 switch result {
                 case .success(let newGames):
                     games = newGames
@@ -64,7 +70,7 @@ struct PlayerView: View {
                 }
             }
             
-            networkManager.fetchMyHeroes(from: Link.myHeroes.url) { result in
+            networkManager.fetchMyHeroes(from: Link.myHeroes(accountID: networkManager.accountId).url) { result in
                 switch result {
                 case .success(let myHeroes):
                     heroes = myHeroes // Присваиваем значение myHeroes свойству heroes
