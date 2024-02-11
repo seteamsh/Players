@@ -28,23 +28,20 @@ struct ContentView: View {
                     secondaryTitle: "Cancel",
                     keyboardType: .numberPad) { text in
                         networkManager.accountId = text
-                        request()
+                        networkManager.fetchPlayer() { result in
+                            switch result {
+                            case .success(let newPlayer):
+                                players.append(contentsOf: newPlayer)
+                            case .failure(let someError):
+                                print("\(someError)")
+                            }
+                        }
                     } secondaryAction: {
                         print("Canceled")
                     }
             }, label: {
                 Image(systemName: "plus")
             }) )
-        }
-    }
-    func request() {
-        networkManager.fetchPlayer() { result in
-            switch result {
-            case .success(let newPlayer):
-                players.append(contentsOf: newPlayer)
-            case .failure(let someError):
-                print("\(someError)")
-            }
         }
     }
 }
