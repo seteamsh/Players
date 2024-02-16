@@ -20,9 +20,9 @@ enum Link {
         case .profile(let accountID):
             return URL(string: "https://api.opendota.com/api/players/\(accountID)")!
         case .games(let accountID):
-            return URL(string: "https://api.opendota.com/api/players/\(accountID)/wl")!
+            return URL(string: "https://api.opendota.com/api/players/\(accountID)/wl\(NetworkManager.shared.isTurbo ? "?significant=0&game_mode=23" : "")")!
         case .myHeroes(let accountID):
-            return URL(string: "https://api.opendota.com/api/players/\(accountID)/heroes")!
+            return URL(string: "https://api.opendota.com/api/players/\(accountID)/heroes\(NetworkManager.shared.isTurbo ? "?significant=0&game_mode=23" : "")")!
         case .allHeroes:
             return URL(string: "https://api.opendota.com/api/heroStats")!
         }
@@ -33,6 +33,7 @@ final class NetworkManager: ObservableObject {
     static let shared = NetworkManager()
     @Published var allHeroes = [AllHeroes]()
     @Published var accountId = ""
+    @Published var isTurbo = false
     func fetchPlayer(completion: @escaping(Result<[Profile], NetworkError>) -> Void) {
         AF.request(Link.profile(accountID: accountId).url)
             .validate()

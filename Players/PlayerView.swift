@@ -10,14 +10,54 @@ import Kingfisher
 struct PlayerView: View {
     @StateObject var networkManager = NetworkManager.shared
     var player: Profile
-    @State var games: Games?
-    @State var heroes = [MyHeroes]()
+    @Binding var games: Games?
+    @Binding var heroes: [MyHeroes]
+    
     var body: some View {
         TabView {
             NavigationView {
                 VStack {
                     KFImage(URL(string: "\(player.avatarfull)"))
-                    // add turbowarrior
+                    Toggle("Турбовоин", isOn: $networkManager.isTurbo)
+                        .onChange(of: networkManager.isTurbo) { oldValue, newValue in
+                            if newValue {
+                                networkManager.fetchGames() { result in
+                                    switch result {
+                                    case .success(let newGames):
+                                        games = newGames
+                                    case .failure(let someError):
+                                        print("\(someError)")
+                                    }
+                                }
+                                
+                                networkManager.fetchMyHeroes() { result in
+                                    switch result {
+                                    case .success(let myHeroes):
+                                        heroes = myHeroes // Присваиваем значение myHeroes свойству heroes
+                                    case .failure(let error):
+                                        print("\(error)")
+                                    }
+                                }
+                            } else {
+                                networkManager.fetchGames() { result in
+                                    switch result {
+                                    case .success(let newGames):
+                                        games = newGames
+                                    case .failure(let someError):
+                                        print("\(someError)")
+                                    }
+                                }
+                                
+                                networkManager.fetchMyHeroes() { result in
+                                    switch result {
+                                    case .success(let myHeroes):
+                                        heroes = myHeroes // Присваиваем значение myHeroes свойству heroes
+                                    case .failure(let error):
+                                        print("\(error)")
+                                    }
+                                }
+                            }
+                        }
                     HStack {
                         VStack {
                             Text("WINS")
@@ -61,23 +101,6 @@ struct PlayerView: View {
                 .tabItem { Image(systemName: "2.circle") }
         }
         .task {
-            networkManager.fetchGames() { result in
-                switch result {
-                case .success(let newGames):
-                    games = newGames
-                case .failure(let someError):
-                    print("\(someError)")
-                }
-            }
-            
-            networkManager.fetchMyHeroes() { result in
-                switch result {
-                case .success(let myHeroes):
-                    heroes = myHeroes // Присваиваем значение myHeroes свойству heroes
-                case .failure(let error):
-                    print("\(error)")
-                }
-            }
             networkManager.fetchAllHeroes() { result in
                 switch result {
                 case .success(let heroes):
@@ -89,6 +112,5 @@ struct PlayerView: View {
         }
     }
 }
-#Preview {
-    PlayerView( player: Profile(personaname: "e", avatarfull: "f"))
-}
+
+

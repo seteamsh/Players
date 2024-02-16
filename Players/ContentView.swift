@@ -9,18 +9,23 @@ import SwiftUI
 import Alamofire
 struct ContentView: View {
     @StateObject var networkManager = NetworkManager.shared
-    @StateObject var coreDataStack = CoreDataStack.shared
+    
     @State var players = [Profile]()
+    @State var games: Games?
+    @State var heroes = [MyHeroes]()
     var body: some View {
         NavigationView {
-            List(players, id: \.self) { player in
-                NavigationLink{
-                    PlayerView(player: player)
-                } label: {
-                    Text("\(player.personaname)")
+            List {
+                ForEach(players, id: \.self) { player in
+                    NavigationLink{
+                        PlayerView(player: player, games: $games, heroes: $heroes)
+                    } label: {
+                        Text("\(player.personaname)")
+                    }
                 }
+                .onDelete(perform: removeProfile)
             }
-            .navigationTitle("Players")
+            .navigationTitle(navigationTitle())
             .navigationBarItems(trailing: Button(action: {
                 alertTF(
                     title: "AccountID",
@@ -37,14 +42,38 @@ struct ContentView: View {
                                 print("\(someError)")
                             }
                         }
+                        networkManager.fetchGames() { result in
+                            switch result {
+                            case .success(let newGames):
+                                games = newGames
+                            case .failure(let someError):
+                                print("\(someError)")
+                            }
+                        }
+                        
+                        networkManager.fetchMyHeroes() { result in
+                            switch result {
+                            case .success(let myHeroes):
+                                heroes = myHeroes // Присваиваем значение myHeroes свойству heroes
+                            case .failure(let error):
+                                print("\(error)")
+                            }
+                        }
                     } secondaryAction: {
                         print("Canceled")
                     }
             }, label: {
                 Image(systemName: "plus")
             }) )
-            .environment(\.managedObjectContext, coreDataStack.persistantContainer.viewContext)
         }
+    }
+    func navigationTitle() -> String {
+        if players.isEmpty { return "Add player"}
+        if players.count == 1 { return "Player"}
+        return "Players"
+    }
+    func removeProfile(as offsets: IndexSet) {
+        players.remove(atOffsets: offsets)
     }
 }
 
