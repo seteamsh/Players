@@ -9,6 +9,7 @@ import SwiftUI
 import Alamofire
 struct ContentView: View {
     @StateObject var networkManager = NetworkManager.shared
+    @StateObject var coreDataStack = CoreDataStack.shared
     @State var players = [Profile]()
     var body: some View {
         NavigationView {
@@ -42,6 +43,7 @@ struct ContentView: View {
             }, label: {
                 Image(systemName: "plus")
             }) )
+            .environment(\.managedObjectContext, coreDataStack.persistantContainer.viewContext)
         }
     }
 }
