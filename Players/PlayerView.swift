@@ -19,6 +19,8 @@ struct PlayerView: View {
                 VStack {
                     KFImage(URL(string: "\(player.avatarfull)"))
                     Toggle("Турбовоин", isOn: $networkManager.isTurbo)
+                        .padding()
+                        .frame(width: 230)
                         .onChange(of: networkManager.isTurbo) { oldValue, newValue in
                             if newValue {
                                 networkManager.fetchGames() { result in
