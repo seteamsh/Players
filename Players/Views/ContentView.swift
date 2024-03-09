@@ -17,14 +17,13 @@ struct ContentView: View {
         NavigationView {
             List {
                 ForEach(players, id: \.self) { player in
-                    NavigationLink{
-                        PlayerView(player: player, games: $games, heroes: $heroes)
-                    } label: {
+                    NavigationLink(destination: PlayerView(player: player, games: $games, heroes: $heroes)) {
                         Text("\(player.personaname)")
                     }
                 }
                 .onDelete(perform: removeProfile)
             }
+            .listStyle(.plain)
             .navigationTitle(navigationTitle())
             .navigationBarItems(trailing: Button(action: {
                 alertTF(
