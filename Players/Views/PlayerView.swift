@@ -91,7 +91,7 @@ struct PlayerView: View {
                         }
                         VStack {
                             Text("\(networkManager.getHeroName(for: hero.hero_id)!)")
-                            Text("\(networkManager.timeAgoString(from: hero.last_played))")
+                            Text("\(timeAgoString(from: hero.last_played))")
                         }
                         Text("\(hero.games)")
                             .foregroundColor(Color.green)
